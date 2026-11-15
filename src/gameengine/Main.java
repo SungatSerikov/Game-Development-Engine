@@ -5,11 +5,27 @@ import gameengine.model.Player;
 import gameengine.observer.GameLogger;
 import gameengine.observer.HealthDisplay;
 import gameengine.strategy.ChaseStrategy;
+import gameengine.factory.PlayerFactory;
+import gameengine.factory.EnemyFactory;
+import gameengine.model.Level;
 
 public class Main {
     public static void main(String[] args) {
-        Player player = new Player("Hero", 1, 1, 100);
-        Enemy enemy = new Enemy("Goblin", 3, 1, 10);
+        PlayerFactory playerFactory = new PlayerFactory();
+        EnemyFactory enemyFactory = new EnemyFactory();
+
+        Level level = new Level.Builder()
+                .setName("Training Arena")
+                .setPlayer(playerFactory.create("Hero", 1, 1))
+                .addEnemy(enemyFactory.create("Goblin", 3, 1))
+                .build();
+
+        Player player = level.getPlayer();
+        Enemy enemy = level.getEnemies().get(0);
+
+        System.out.println("Level: " + level.getName());
+        System.out.println("Enemies: " + level.getEnemies().size());
+
         GameLogger logger = new GameLogger();
         player.subscribe(new HealthDisplay());
         player.subscribe(logger);
@@ -27,5 +43,8 @@ public class Main {
         player.unsubscribe(logger);
         System.out.println("Attack after removing the logger:");
         enemy.update(player);
+
+
+        
     }
 }
