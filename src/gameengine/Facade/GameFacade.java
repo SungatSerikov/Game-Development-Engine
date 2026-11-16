@@ -41,6 +41,8 @@ public class GameFacade {
 
         Enemy enemy = enemyFactory.create("Goblin", 3, 1);
         behavior = new IdleStrategy();
+        renderer = new ConsoleRenderer2d();
+
         enemy.setBehavior(behavior);
 
         level = new Level.Builder()
@@ -90,10 +92,24 @@ public class GameFacade {
     public void nextTurn() {
         Level current = requireLevel();
         Player player = current.getPlayer();
+
+        if (player.getHealth() == 0) {
+            System.out.println("Game over. Enter Create to start a new game.");
+            return;
+        }
+
         for (Enemy enemy : current.getEnemies()) {
             enemy.update(player);
+
+            if (player.getHealth() == 0) {
+                break;
+            }
         }
         renderLevel(current);
+
+        if (player.getHealth() == 0) {
+            System.out.println("Game over. Enter Create to start a new game.");
+        }
     }
 
     public void setRenderMode(String mode) {
