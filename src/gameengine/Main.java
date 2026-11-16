@@ -1,5 +1,6 @@
 package gameengine;
 
+import gameengine.Renderer.ConsoleRenderer2d;
 import gameengine.Renderer.ConsoleRenderer3d;
 import gameengine.Renderer.Renderer;
 import gameengine.model.Enemy;
@@ -24,14 +25,7 @@ public class Main {
 
         Player player = level.getPlayer();
         Enemy enemy = level.getEnemies().get(0);
-        Renderer renderer = new ConsoleRenderer3d();
-        //renderer
-        level.getPlayer().setRenderer(renderer);
-        level.getPlayer().render();
-        for (Enemy monster : level.getEnemies()){
-            monster.setRenderer(renderer);
-            monster.render();
-        }
+
         System.out.println("Level: " + level.getName());
         System.out.println("Enemies: " + level.getEnemies().size());
 
@@ -53,7 +47,21 @@ public class Main {
         System.out.println("Attack after removing the logger:");
         enemy.update(player);
 
+        //renderer
+        Renderer renderer2d = new ConsoleRenderer2d();
+        Renderer renderer3d = new ConsoleRenderer3d();
 
+        player.setRenderer(renderer2d);
+        enemy.setRenderer(renderer2d);
+
+        player.render();
+        enemy.render();
+
+        player.setRenderer(renderer3d);
+        enemy.setRenderer(renderer3d);
+
+        enemy.render();
+        player.render();
         
     }
 }
