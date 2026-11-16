@@ -1,67 +1,75 @@
 package gameengine;
+import gameengine.Facade.GameFacade;
 
-import gameengine.Renderer.ConsoleRenderer2d;
-import gameengine.Renderer.ConsoleRenderer3d;
-import gameengine.Renderer.Renderer;
-import gameengine.model.Enemy;
-import gameengine.model.Player;
-import gameengine.observer.GameLogger;
-import gameengine.observer.HealthDisplay;
-import gameengine.strategy.ChaseStrategy;
-import gameengine.factory.PlayerFactory;
-import gameengine.factory.EnemyFactory;
-import gameengine.model.Level;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
-        PlayerFactory playerFactory = new PlayerFactory();
-        EnemyFactory enemyFactory = new EnemyFactory();
+        GameFacade game = new GameFacade();
+        System.out.println("""
+            ====Main Menu====
+            Create - creates a demo level, uses 2d renderer and idle state by default
+            Spawn - spawns an enemy, requires name, x, y
+            Behavior - sets enemy behavior: idle or chase
+            Next - next iteration of the game
+            Render - renders a game with chosen renderer: 2d or 3d
+            Status - shows the game's status
+            Logoff - unsubscribe to health logger
+            Exit - exit
+        """);
 
-        Level level = new Level.Builder()
-                .setName("Training Arena")
-                .setPlayer(playerFactory.create("Hero", 1, 1))
-                .addEnemy(enemyFactory.create("Goblin", 3, 1))
-                .build();
+        try (Scanner input = new Scanner(System.in)) {
+            while (true) {
+                try {
+                    switch (ask(input, "> ")) {
+                        case "Create":
+                            game.createDemoLevel();
+                            break;
+                        case "Spawn": {
+                                String name = ask(input, "Enemy's name: ");
+                                int x = Integer.parseInt(ask(input, "X: "));
+                                int y = Integer.parseInt(ask(input, "Y: "));
+                                game.spawnEnemy(name, x, y);
+                            }
+                            break;
+                        case "Behavior":
+                            game.setEnemyBehavior(
+                                ask(input, "idle or chase: "));
+                            break;
+                        case "Next":
+                            game.nextTurn();
+                            break;
+                        case "Render":
+                            game.setRenderMode(
+                                ask(input, "2d or 3d: "));
+                            break;
+                        case "Status":
+                            game.showStatus();
+                            break;
+                        case "Logoff":
+                            game.disableHealthLog();
+                            break;
+                        case "Exit":
+                            return;
+                        default:
+                            System.out.println("Unknown command.");
+                            break;
+                    }
+                } catch (NumberFormatException error) {
+                    System.out.println("Coordinates must be an integers.");
+                } catch (IllegalArgumentException | IllegalStateException error) {
+                    System.out.println(error.getMessage());
+                } catch (NoSuchElementException endOfInput) {
+                    return;
+                }
+            }
+        }
+    }
 
-        Player player = level.getPlayer();
-        Enemy enemy = level.getEnemies().get(0);
-
-        System.out.println("Level: " + level.getName());
-        System.out.println("Enemies: " + level.getEnemies().size());
-
-        GameLogger logger = new GameLogger();
-        player.subscribe(new HealthDisplay());
-        player.subscribe(logger);
-
-        enemy.update(player);
-        System.out.printf("Idle turn: Goblin at (%d, %d)%n", enemy.getX(), enemy.getY());
-
-        enemy.setBehavior(new ChaseStrategy());
-        enemy.update(player);
-        System.out.printf("Chase turn: Goblin at (%d, %d)%n", enemy.getX(), enemy.getY());
-
-        System.out.println("Attack with both observers:");
-        enemy.update(player);
-
-        player.unsubscribe(logger);
-        System.out.println("Attack after removing the logger:");
-        enemy.update(player);
-
-        //renderer
-        Renderer renderer2d = new ConsoleRenderer2d();
-        Renderer renderer3d = new ConsoleRenderer3d();
-
-        player.setRenderer(renderer2d);
-        enemy.setRenderer(renderer2d);
-
-        player.render();
-        enemy.render();
-
-        player.setRenderer(renderer3d);
-        enemy.setRenderer(renderer3d);
-
-        enemy.render();
-        player.render();
-        
+    private static String ask(Scanner input, String prompt) {
+        System.out.print(prompt);
+        return input.nextLine().trim();
     }
 }
+
+
