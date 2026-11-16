@@ -1,5 +1,7 @@
 package gameengine;
 
+import gameengine.Renderer.ConsoleRenderer3d;
+import gameengine.Renderer.Renderer;
 import gameengine.model.Enemy;
 import gameengine.model.Player;
 import gameengine.observer.GameLogger;
@@ -22,7 +24,14 @@ public class Main {
 
         Player player = level.getPlayer();
         Enemy enemy = level.getEnemies().get(0);
-
+        Renderer renderer = new ConsoleRenderer3d();
+        //renderer
+        level.getPlayer().setRenderer(renderer);
+        level.getPlayer().render();
+        for (Enemy monster : level.getEnemies()){
+            monster.setRenderer(renderer);
+            monster.render();
+        }
         System.out.println("Level: " + level.getName());
         System.out.println("Enemies: " + level.getEnemies().size());
 
