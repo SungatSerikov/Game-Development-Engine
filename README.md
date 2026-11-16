@@ -42,6 +42,11 @@ Start with `Create`. Commands are case-sensitive. Enter each argument separately
 | **Observer** | `Player`, `HealthObserver`, `HealthDisplay`, `GameLogger` | Notifies subscribers when the player's health changes. |
 | **Facade** | `GameFacade`, `Main` | `Main` reads console commands and calls facade methods. The facade coordinates scene creation, turns, and rendering. |
 
+| Student | Individually implemented patterns | Main responsibilities |
+|---|---|---|
+| Sungat | Builder, Factory Method | Implemented player and enemy factories, level construction through `Level.Builder`, and their initial integration into `Main`. |
+| Maksat | Strategy, Observer | Implemented idle and chase behaviors, enemy movement and attacks, health notifications, and observer subscription and unsubscription. |
+| Tole | Bridge, Facade | Implemented interchangeable 2D and simulated 3D console renderers, `GameFacade`, and the interactive console menu. |
 ## Demo Walkthrough
 
 1. Enter `Create`, then `Next`. The goblin stays at `(3, 1)`.
